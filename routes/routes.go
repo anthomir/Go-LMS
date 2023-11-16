@@ -35,7 +35,7 @@ func SetupRoutes(router *gin.Engine) {
 
 		courseRoutes.POST("/review/:id", middleware.RequireUserAuth, courseHandler.ReviewById) // User
 		courseRoutes.POST("/subscribe/:id", middleware.RequireUserAuth, courseHandler.SubscribeToCourse) // User
-		courseRoutes.GET("/", middleware.RequireUserAuth, courseHandler.FindAll) // User
+		courseRoutes.GET("/", middleware.RequireUserAuth, courseHandler.SearchCoursesHandler) // User
 		courseRoutes.GET("/:id", middleware.RequireUserAuth, courseHandler.FindById) // User
 		courseRoutes.GET("/user/:id", middleware.RequireUserAuth, courseHandler.FindByUserId) // User
 

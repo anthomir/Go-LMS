@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/anthomir/GoProject/enums"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -17,6 +18,7 @@ type Course struct {
 	Chapters    []Chapter `gorm:"foreignKey:CourseID" json:"chapters"`
 	Subscribers []User    `gorm:"many2many:subscription;" json:"subscribers"`
 	Reviews 	[]Review  `gorm:"foreignKey:CourseId" json:"reviews"`
+	Category    enums.Category  `gorm:"column:category" json:"category"`
 	CreatedBy   uuid.UUID  `gorm:"column:created_by" json:"createdBy"`
 }
 

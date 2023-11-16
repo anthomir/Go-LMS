@@ -43,14 +43,31 @@ func (s *CourseService) Create(courseModel *models.Course) (*models.Course, erro
     return createdCourse, nil
 }
 
-func (s *CourseService) FindAll() (*[]models.CourseWithReviews, error) {
+func (s *CourseService) FindAll(category, minPrice, maxPrice, title string) (*[]models.CourseWithReviews, error) {
 	var courseWithReviews []models.CourseWithReviews
 
-	result := initializers.DB.Model(&models.Course{}).
+	query := initializers.DB.Model(&models.Course{}).
 		Select("course.*, COUNT(Review.id) as Review_count").
 		Joins("LEFT JOIN Review ON course.id = Review.course_id").
-		Group("course.id").
-		Find(&courseWithReviews)
+		Group("course.id")
+
+	if category != "" {
+		query = query.Where("category = ?", category)
+	}
+
+	if minPrice != "" {
+		query = query.Where("price >= ?", minPrice)
+	}
+
+	if maxPrice != "" {
+		query = query.Where("price <= ?", maxPrice)
+	}
+
+	if title != "" {
+		query = query.Where("title LIKE ?", "%"+title+"%")
+	}
+
+	result := query.Find(&courseWithReviews)
 
 	if result.Error != nil {
 		return nil, result.Error

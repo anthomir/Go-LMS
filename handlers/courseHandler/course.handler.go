@@ -29,24 +29,22 @@ func FindById(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": response})
 }
 
-func FindAll(c *gin.Context) {
+func SearchCoursesHandler(c *gin.Context) {
+	category := c.Query("category")
+	minPrice := c.Query("minPrice")
+	maxPrice := c.Query("maxPrice")
+	title := c.Query("title")
 	courseService := services.NewCourseService(&gorm.DB{})
-	response, err := courseService.FindAll()
+
+	courses, err := courseService.FindAll(category, minPrice, maxPrice, title)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		// Handle error
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
 
-	if len(*response) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "No data found",
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"data": response})
+	// Convert result to JSON and send response
+	c.JSON(http.StatusOK, courses)
 }
 
 func FindByUserId(c *gin.Context) {
