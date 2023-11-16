@@ -37,7 +37,7 @@ func FindByUser(c *gin.Context) {
     }
 
 	groupService := services.NewGroupService(&gorm.DB{})
-	response, err := groupService.FindByUser(user.ID)
+	response, err := groupService.GetGroupsByUserID(user.ID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": err,
@@ -103,6 +103,7 @@ func RemoveUserFromGroupHandler(c *gin.Context) {
 func Create(c *gin.Context) {
 	var dtoData dto.GroupCreateDto
 	user := c.MustGet("user").(*models.User)
+	groupService := services.NewGroupService(&gorm.DB{})
 
 	if err := c.ShouldBindJSON(&dtoData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -117,7 +118,7 @@ func Create(c *gin.Context) {
 		CreatedBy:   user.ID,
 	}
 	
-	createdGroup, err := services.CreateGroupWithUsers(groupInternalDto)
+	createdGroup, err := groupService.CreateGroupWithUsers(groupInternalDto)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create group"})
 		return
@@ -155,4 +156,17 @@ func DeleteById(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"message": "Group deleted successfully"})
+}
+
+func GetGroupDetailsHandler(c *gin.Context) {
+	groupService := services.NewGroupService(&gorm.DB{})
+    groupID := c.Param("id")
+
+    groupDetails, err := groupService.GetGroupDetails(groupID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve group details"})
+        return
+    }
+
+    c.JSON(http.StatusOK, groupDetails)
 }

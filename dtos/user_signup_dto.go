@@ -19,7 +19,3 @@ func (u UserSignupDTO) Validate() error {
 	validate := validator.New()
 	return validate.Struct(u)
 }
-
-func (UserSignupDTO) TableName() string {
-	return "users"
-}

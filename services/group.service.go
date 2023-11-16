@@ -26,23 +26,30 @@ func (s *GroupService) FindById(id string) (*models.Group, error) {
 	return &group, nil
 }
 
-func CreateGroupWithUsers(groupDto dto.GroupInternalDto) (*models.Group, error) {
+func (s *GroupService) CreateGroupWithUsers(groupDto dto.GroupInternalDto) (*models.Group, error) {
 	var users []models.User
-	initializers.DB.Where("id IN ?", groupDto.Users).Find(&users)
 
-	group := models.Group{
-		CourseID:    groupDto.CourseID,
-		Title:       groupDto.Title,
-		Description: groupDto.Description,
-		Users: 		 users,
-		CreatedBy:   groupDto.CreatedBy,
-	}
-
-	if err := initializers.DB.Create(&group).Error; err != nil {
+	if err := initializers.DB.Where("id IN (?)", groupDto.Users).Find(&users).Error; err != nil {
 		return nil, err
 	}
 
-	return &group, nil
+	newGroup := models.Group{
+        CourseID: groupDto.CourseID,
+		Title:       groupDto.Title,
+		Description: groupDto.Description,
+		CreatedBy:   groupDto.CreatedBy,
+		Users:       users,
+	}
+
+	if err := initializers.DB.Create(&newGroup).Error; err != nil {
+		return nil, err
+	}
+
+	if err := initializers.DB.Model(&newGroup).Preload("Users").Find(&newGroup).Error; err != nil {
+		return nil, err
+	}
+
+	return &newGroup, nil
 }
 
 func (s *GroupService) DeleteAll() error {
@@ -67,13 +74,13 @@ func (s *GroupService) DeleteById(id uuid.UUID) error {
 	return nil
 }
 
-func (s *GroupService) FindByUser(userID uuid.UUID) ([]models.Group, error) {
+func (s *GroupService) GetGroupsByUserID(userID uuid.UUID) ([]models.Group, error) {
     var user models.User
-	if err := initializers.DB.Preload("Groups.Users").Where("id = ?", userID).First(&user).Error; err != nil {
-		return nil, err
-	}
+    if err := initializers.DB.Where("id = ?", userID).Preload("Groups").First(&user).Error; err != nil {
+        return nil, err
+    }
 
-	return user.Groups, nil
+    return user.Groups, nil
 }
 
 func (groupService *GroupService) AddUsersToGroup(groupID uuid.UUID, userIds []uuid.UUID) (*models.Group, error) {
@@ -111,7 +118,6 @@ func (groupService *GroupService) AddUsersToGroup(groupID uuid.UUID, userIds []u
     return &group, nil
 }
 
-// RemoveUsersFromGroup removes multiple users from a group by their user IDs and returns the updated group.
 func (groupService *GroupService) RemoveUsersFromGroup(groupID uuid.UUID, userIDs []uuid.UUID) (*models.Group, error) {
     // Fetch the group by ID
     var group models.Group
@@ -142,4 +148,43 @@ func (groupService *GroupService) RemoveUsersFromGroup(groupID uuid.UUID, userID
     }
 
     return &group, nil
+}
+
+func (s *GroupService) GetGroupDetails(groupID string) (*dto.GroupDetails, error) {
+	chapterService := NewChapterService(&gorm.DB{})
+
+    var group models.Group
+    result := initializers.DB.Model(&models.Group{}).Preload("Users").Where("id = ?", groupID).First(&group)
+    if result.Error != nil {
+        return nil, result.Error
+    }
+
+    var groupDetails dto.GroupDetails
+    groupDetails.Group = group
+    groupDetails.Users = make([]dto.UserWithScore, len(group.Users))
+
+    for i, user := range group.Users {
+        completedChaptersCount, err := chapterService.GetCompletedChaptersCount(user.ID, group.CourseID)
+        if err != nil {
+            return nil, err
+        }
+
+        // Calculate total chapters count for the specific course
+        totalChaptersCount, err := chapterService.GetTotalChaptersCountForCourse(group.CourseID)
+        if err != nil {
+            return nil, err
+        }
+
+        if totalChaptersCount == 0 {
+            groupDetails.Users[i] = dto.UserWithScore{User: user, Score: 0}
+        } else {
+            score := float64(completedChaptersCount) / float64(totalChaptersCount)
+            groupDetails.Users[i] = dto.UserWithScore{
+                User:  user,
+                Score: score,
+            }
+        }
+    }
+
+    return &groupDetails, nil
 }

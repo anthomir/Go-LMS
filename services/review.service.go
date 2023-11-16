@@ -20,7 +20,7 @@ func (s *ReviewService) AddReview(course *models.Course, createdBy *models.User,
         Course:      *course,
         Rating:      rating,
         Description: description,
-        CreatedBy:   *createdBy,
+        CreatedBy:   createdBy.ID,
     }
 
     result := initializers.DB.Create(&review)

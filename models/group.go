@@ -10,16 +10,15 @@ import (
 
 type Group struct {
     UUIDModel
-    CourseID    string    `gorm:"column:course_id" validate:"required" json:"courseId"`
+    CourseID    uuid.UUID    `gorm:"column:course_id" validate:"required" json:"courseId"`
     Title       string    `gorm:"column:title" validate:"required" json:"title"`
     Description string    `gorm:"column:description" json:"description"`
     Users       []User    `gorm:"many2many:user_group;" json:"users"`
-	Scoreboard []Scoreboard `gorm:"foreignkey:GroupID" json:"scoreboard"`
     CreatedBy   uuid.UUID `gorm:"column:created_by;index" json:"createdBy"`
 }
 
 func (Group) TableName() string {
-	return "group"
+    return "group" // specify the actual table name
 }
 
 // ========================================================= //

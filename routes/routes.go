@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/anthomir/GoProject/handlers/chapterHandler"
 	"github.com/anthomir/GoProject/handlers/courseHandler"
 	"github.com/anthomir/GoProject/handlers/groupHandler"
 	"github.com/anthomir/GoProject/handlers/userHandler"
@@ -42,12 +43,23 @@ func SetupRoutes(router *gin.Engine) {
 		courseRoutes.DELETE("/", middleware.RequireTeacherAuth, courseHandler.DeleteAll) // Teacher 
 	}
 
+	chapterRoutes := router.Group("/chapter")
+	{
+		chapterRoutes.POST("/", middleware.RequireTeacherAuth, chapterHandler.Create) // Teacher
+
+		chapterRoutes.GET("/course/:id", middleware.RequireUserAuth, chapterHandler.FindAllByCourseId) // User
+		chapterRoutes.GET("/:id", middleware.RequireUserAuth, chapterHandler.FindById) // User
+
+		chapterRoutes.DELETE("/", middleware.RequireTeacherAuth, chapterHandler.DeleteAll) // Teacher 
+	}
+
 	groupRoutes := router.Group("/group")
 	{
 		groupRoutes.POST("/", middleware.RequireUserAuth, groupHandler.Create ) // User
-		groupRoutes.PUT("/add/:id", middleware.RequireUserAuth, groupHandler.AddUsersToGroup ) // Group Admin
-		groupRoutes.PUT("/remove/:id", middleware.RequireUserAuth, groupHandler.AddUsersToGroup ) // Group Admin
+		groupRoutes.PUT("/add/:id", middleware.RequireUserAuth, groupHandler.AddUsersToGroup ) // GroupAdmin
+		groupRoutes.PUT("/remove/:id", middleware.RequireUserAuth, groupHandler.AddUsersToGroup ) // GroupAdmin
 
+		groupRoutes.GET("/details/:id", middleware.RequireUserAuth, groupHandler.GetGroupDetailsHandler) // User
 		groupRoutes.GET("/", middleware.RequireUserAuth, groupHandler.FindByUser ) // User
 
 		groupRoutes.DELETE("/", middleware.RequireUserAuth, groupHandler.DeleteById ) // User

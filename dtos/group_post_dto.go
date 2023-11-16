@@ -7,14 +7,14 @@ import (
 
 // UserLoginDTO represents the data structure for user login requests.
 type GroupCreateDto struct {
-	CourseID    string    `gorm:"column:course_id" validate:"required" json:"courseId"`
+	CourseID    uuid.UUID    `gorm:"column:course_id" validate:"required" json:"courseId"`
 	Title       string    `gorm:"column:title" validate:"required" json:"title"`
 	Description string    `gorm:"column:description" json:"description"`
 	Users       []uuid.UUID    `json:"users"`
 }
 
 type GroupInternalDto struct {
-    CourseID    string    `gorm:"column:course_id" validate:"required" json:"courseId"`
+    CourseID    uuid.UUID    `gorm:"column:course_id" validate:"required" json:"courseId"`
     Title       string    `gorm:"column:title" validate:"required" json:"title"`
     Description string    `gorm:"column:description" json:"description"`
     Users       []uuid.UUID    `gorm:"many2many:user_group;" json:"users"`
@@ -26,6 +26,3 @@ func (u GroupCreateDto) Validate() error {
 	return validate.Struct(u)
 }
 
-func (GroupInternalDto) TableName() string {
-	return "group"
-}

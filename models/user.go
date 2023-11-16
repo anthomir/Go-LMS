@@ -11,22 +11,21 @@ import (
 
 type User struct {
 	UUIDModel
-	FirstName           string     `gorm:"column:first_name" json:"firstName"`
-	LastName            string     `gorm:"column:last_name" json:"lastName"`
-	Email               string     `gorm:"column:email" validate:"required" json:"email"`
-	Password            string     `gorm:"column:password; size:100" validate:"required" json:"password"`
-	Role                enums.Role `gorm:"column:role" json:"role"`
-	Balance             float64    `gorm:"column:balance;default:100" json:"balance"`
-	CourseSubscriptions []Course   `gorm:"many2many:subscription;" json:"subscriptions"`
-	CreatedCourses      []Course   `gorm:"foreignkey:CreatedBy" json:"createdCourses"`
-	Groups         		[]Group    `gorm:"many2many:user_group;" json:"groups"`
-	Scoreboard 			Scoreboard `gorm:"foreignkey:UserID" json:"scoreboard"`
+	FirstName           string       `gorm:"column:first_name" json:"firstName"`
+	LastName            string       `gorm:"column:last_name" json:"lastName"`
+	Email               string       `gorm:"column:email" validate:"required" json:"email"`
+	Password            string       `gorm:"column:password; size:100" validate:"required" json:"password"`
+	Role                enums.Role   `gorm:"column:role" json:"role"`
+	Balance             float64      `gorm:"column:balance;default:100" json:"balance"`
+	CourseSubscriptions []Course     `gorm:"many2many:subscription;" json:"subscriptions"`
+	CreatedCourses      []Course     `gorm:"foreignKey:CreatedBy" json:"createdCourses"`
+	Groups				[]Group 	 `gorm:"many2many:user_group;" json:"groups"`
+	CompletedChapters 	[]UserChapter `gorm:"foreignKey:UserID" json:"completedChapters"`
 }
 
 func (User) TableName() string {
-	return "users"
+    return "users"
 }
-
 // ========================================================= //
 // ======================= Validation ====================== //
 // ========================================================= //

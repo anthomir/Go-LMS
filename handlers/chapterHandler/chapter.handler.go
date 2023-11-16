@@ -68,7 +68,7 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	errCreation := chapterService.Create(&chapter)
+	result, errCreation := chapterService.Create(&chapter)
 	if errCreation != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": errCreation.Error(),
@@ -76,7 +76,7 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"msg": "Created successfully"})
+	c.JSON(http.StatusOK, gin.H{"data": result ,"msg": "Created successfully"})
 }
 
 // Delete All Chapters
@@ -91,4 +91,36 @@ func DeleteAll(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"msg": "Deleted successfully"})
+}
+
+func AddUserChapterHandler(c *gin.Context) {
+	chapterService := services.NewChapterService(&gorm.DB{})
+
+	userAuth, _ := c.Get("user")
+	userParam, ok := userAuth.(models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	chapterId, err := uuid.Parse(c.Param("chapterId"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID"})
+        return
+    }
+    completed, _ := strconv.ParseBool(c.Param("completed"))
+
+    userChapter := models.UserChapter{
+        UserID:     userParam.ID,
+        ChapterID:  chapterId,
+        Completed:  completed,
+    }
+
+    errServ := chapterService.AddUserChapter(&userChapter)
+    if errServ != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add UserChapter record"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "UserChapter record added successfully"})
 }

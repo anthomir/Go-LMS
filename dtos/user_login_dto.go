@@ -15,7 +15,3 @@ func (u UserLoginDTO) Validate() error {
 	validate := validator.New()
 	return validate.Struct(u)
 }
-
-func (UserLoginDTO) TableName() string {
-	return "users"
-}

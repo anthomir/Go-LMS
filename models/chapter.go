@@ -4,16 +4,17 @@ import (
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type Chapter struct {
-	UUIDModel
-	CourseID    string `gorm:"column:course_id" json:"courseId"`
-	Title       string `gorm:"column:title" json:"title"`
-	Description string `gorm:"column:description" json:"description"`
-	VideoUrl    string `gorm:"column:video_url" json:"videoUrl"`
-	Course      Course `gorm:"column:course" json:"course"`
+    UUIDModel
+    CourseID    uuid.UUID `gorm:"type:uuid;column:course_id" json:"courseId"`
+    Title       string    `gorm:"column:title" json:"title"`
+    Description string    `gorm:"column:description" json:"description"`
+    VideoUrl    string    `gorm:"column:video_url" json:"videoUrl"`
+    Course      Course    `gorm:"foreignKey:CourseID" json:"course"`
 }
 
 func (Chapter) TableName() string {

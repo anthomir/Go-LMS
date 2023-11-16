@@ -11,17 +11,16 @@ import (
 
 type Course struct {
 	UUIDModel
-	Title       string    `gorm:"column:title" json:"title"`
-	Description string    `gorm:"column:description" json:"description"`
-	Price       string    `gorm:"column:price" json:"price"`
-	ImageUrl    string    `gorm:"column:image_url" json:"imageUrl"`
-	Chapters    []Chapter `gorm:"foreignKey:CourseID" json:"chapters"`
-	Subscribers []User    `gorm:"many2many:subscription;" json:"subscribers"`
-	Reviews 	[]Review  `gorm:"foreignKey:CourseId" json:"reviews"`
-	Category    enums.Category  `gorm:"column:category" json:"category"`
-	CreatedBy   uuid.UUID  `gorm:"column:created_by" json:"createdBy"`
+	Title       string          `gorm:"column:title" json:"title"`
+	Description string          `gorm:"column:description" json:"description"`
+	Price       string          `gorm:"column:price" json:"price"`
+	ImageUrl    string          `gorm:"column:image_url" json:"imageUrl"`
+	Chapters    []Chapter       `gorm:"foreignKey:CourseID" json:"chapters"`
+	Subscribers []User          `gorm:"many2many:subscription;" json:"subscribers"`
+	Reviews     []Review        `gorm:"foreignKey:CourseID" json:"reviews"`
+	Category    enums.Category   `gorm:"column:category" json:"category"`
+	CreatedBy   uuid.UUID            `gorm:"column:created_by_id" json:"createdBy"`
 }
-
 type CourseWithReviews struct {
 	Course
 	Reviews int `gorm:"column:reviews_count" json:"reviewsCount"` // Count of reviews for each post
