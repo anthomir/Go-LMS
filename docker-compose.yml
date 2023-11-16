@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+    db:
+        image: postgres:latest
+        restart: always
+        environment:
+            - POSTGRES_USER=admin
+            - POSTGRES_PASSWORD=admin
+            - POSTGRES_DB=go-database
+        ports:
+            - '5435:5432'
+        volumes:
+            - db:/var/lib/postgresql/data
+
+    # backend:
+    #   build: .
+    #   restart: always
+    #   ports:
+    #     - '8000:8000'
+    #   depends_on:
+    #     - db
+    #   environment:
+    #     - PORT=8000
+    #     - DB_URL=host=db user=admin password=admin dbname=go-database port=5432 sslmode=disable
+    #     - JWT_SECRET=ihtb348297q0h8wjiewfelgkrnhbo34862793809jqwomsadsfdlbf123h4332efrfbgreq31q
+
+volumes:
+    db:
+        driver: local
