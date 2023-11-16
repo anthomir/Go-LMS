@@ -31,7 +31,11 @@ func FindById(c *gin.Context) {
 func FindAllByCourseId(c *gin.Context) {
 	idParam := c.Param("id")
 	userID, err := uuid.Parse(idParam)
-
+	if err!= nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": err,
+		})
+	}
 	skipParam, err1 := strconv.Atoi(c.DefaultQuery("skip", "0"))
 	takeParam, err2 := strconv.Atoi(c.DefaultQuery("take", "10"))
 
