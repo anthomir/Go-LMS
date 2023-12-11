@@ -9,6 +9,7 @@ type CourseCreateDto struct {
 	Title       string `gorm:"column:title" validate:"required" json:"title"`
 	Description string `gorm:"column:description" validate:"required" json:"description"`
 	Price       string `gorm:"column:price" validate:"required" json:"price"`
+	ImageUrl 	string `gorm:"column:image_url" json:"imageUrl"`
 }
 
 

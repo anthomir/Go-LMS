@@ -104,7 +104,7 @@ func UploadHandler(c *gin.Context) {
 	// Include file path in the success response
 	c.JSON(http.StatusOK, gin.H{
 		"message":      "File uploaded successfully",
-		"filePath":     os.Getenv("PROEJCT_URL")+ filePath,
+		"filePath":     filePath,
 	})
 }
 
@@ -129,6 +129,7 @@ func Create(c *gin.Context) {
         Description: courseDto.Description,
         Price:       courseDto.Price,
         CreatedBy:   user.ID,
+		ImageUrl: 	courseDto.ImageUrl,
     }
 
     createdCourse, errCreation := courseService.Create(&courseModel)
